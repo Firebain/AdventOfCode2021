@@ -12,7 +12,7 @@ const findOccurrencies = (arr: Bit[]): [Bit, Bit] => {
     "1": 0,
   };
 
-  for (let bit of arr) {
+  for (const bit of arr) {
     occurrences[bit] += 1;
   }
 
@@ -31,7 +31,7 @@ export const first = (input: string) => {
   const mostCommonArray = [];
   const leastCommonArray = [];
 
-  for (let arr of rotateMatrix(data)) {
+  for (const arr of rotateMatrix(data)) {
     const [most, least] = findOccurrencies(arr);
 
     mostCommonArray.push(most);

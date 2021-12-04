@@ -6,7 +6,7 @@ export const first = (input: string) => {
   let prev = Number.POSITIVE_INFINITY;
   let counter = 0;
 
-  for (let num of numbers) {
+  for (const num of numbers) {
     if (prev < num) {
       counter += 1;
     }
