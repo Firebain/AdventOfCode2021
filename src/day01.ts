@@ -1,8 +1,4 @@
-const parse = (data: string) =>
-  data
-    .trim()
-    .split("\n")
-    .map((num) => parseInt(num));
+const parse = (data: string) => data.split("\n").map((num) => parseInt(num));
 
 export const first = (input: string) => {
   const numbers = parse(input);

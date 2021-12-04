@@ -4,9 +4,8 @@ type Command = [Direction, number];
 
 const parse = (data: string) =>
   data
-    .trim()
     .split("\n")
-    .map((data) => data.trim().split(" "))
+    .map((data) => data.split(" "))
     .map(
       ([direction, units]): Command => [direction as Direction, parseInt(units)]
     );

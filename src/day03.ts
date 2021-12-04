@@ -1,8 +1,5 @@
 const parse = (data: string) =>
-  data
-    .trim()
-    .split("\n")
-    .map((e) => e.trim().split("") as Bit[]);
+  data.split("\n").map((e) => e.split("") as Bit[]);
 
 type Bit = "0" | "1";
 
