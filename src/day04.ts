@@ -1,3 +1,5 @@
+import { flipArray } from "./utils";
+
 type Board = number[][];
 
 const parse = (str: string): [number[], Board[]] => {
@@ -5,25 +7,25 @@ const parse = (str: string): [number[], Board[]] => {
 
   const numbers = rawNumbers.split(",").map(Number);
 
-  const boards = rawBoards.map((c) =>
-    c.split("\n").map((s) =>
-      s
-        .split(" ")
-        .filter((i) => i !== "")
-        .map(Number)
+  const boards = rawBoards
+    .map((c) =>
+      c.split("\n").map((s) =>
+        s
+          .split(" ")
+          .filter((i) => i !== "")
+          .map(Number)
+      )
     )
-  );
+    .map((a) => [...a, ...flipArray(a)]);
 
   return [numbers, boards];
 };
 
-const play = <R>(
-  numbers: number[],
-  boards: Board[],
-  onWin: (number: number) => R
-) => {
-  const marks = [];
+const play = (numbers: number[], boards: Board[]) => {
+  const marks: number[] = [];
   const won: number[] = [];
+
+  const results: number[] = [];
 
   for (const number of numbers) {
     marks.push(number);
@@ -33,58 +35,32 @@ const play = <R>(
         continue;
       }
 
-      for (let i = 0; i < 5; i++) {
-        let rowFilled = true;
-        let columnFilled = true;
+      if (board.some((chunk) => chunk.every((n) => marks.includes(n)))) {
+        const sum =
+          board
+            .flat()
+            .filter((n) => !marks.includes(n))
+            .reduce((a, b) => a + b, 0) / 2;
 
-        for (let j = 0; j < 5; j++) {
-          if (!marks.includes(board[i][j])) {
-            rowFilled = false;
-          }
-
-          if (!marks.includes(board[j][i])) {
-            columnFilled = false;
-          }
-        }
-
-        if (rowFilled || columnFilled) {
-          let sum = 0;
-
-          for (let k = 0; k < 5; k++) {
-            for (let e = 0; e < 5; e++) {
-              if (!marks.includes(board[k][e])) {
-                sum += board[k][e];
-              }
-            }
-          }
-
-          const res = onWin(sum * number);
-
-          if (res) {
-            return res;
-          }
-
-          won.push(index);
-        }
+        won.push(index);
+        results.push(sum * number);
       }
     }
   }
+
+  return results;
 };
 
 export const first = (input: string) => {
   const [numbers, boards] = parse(input);
 
-  return play(numbers, boards, (num) => num);
+  return play(numbers, boards)[0];
 };
 
 export const second = (input: string) => {
   const [numbers, boards] = parse(input);
 
-  let lastWin = 0;
+  const results = play(numbers, boards);
 
-  play(numbers, boards, (num) => {
-    lastWin = num;
-  });
-
-  return lastWin;
+  return results[results.length - 1];
 };

@@ -1,10 +1,9 @@
+import { flipArray } from "./utils";
+
 const parse = (data: string) =>
   data.split("\n").map((e) => e.split("") as Bit[]);
 
 type Bit = "0" | "1";
-
-const rotateMatrix = <T>(arr: T[][]): T[][] =>
-  arr[0].map((val, index) => arr.map((row) => row[index]));
 
 const findOccurrencies = (arr: Bit[]): [Bit, Bit] => {
   const occurrences = {
@@ -31,7 +30,7 @@ export const first = (input: string) => {
   const mostCommonArray = [];
   const leastCommonArray = [];
 
-  for (const arr of rotateMatrix(data)) {
+  for (const arr of flipArray(data)) {
     const [most, least] = findOccurrencies(arr);
 
     mostCommonArray.push(most);
@@ -52,13 +51,13 @@ export const second = (input: string) => {
 
   for (let i = 0; i <= data[0].length; i++) {
     if (oxygenNumbers.length !== 1) {
-      const [most] = findOccurrencies(rotateMatrix(oxygenNumbers)[i]);
+      const [most] = findOccurrencies(flipArray(oxygenNumbers)[i]);
 
       oxygenNumbers = oxygenNumbers.filter((el) => el[i] === most);
     }
 
     if (co2Numbers.length !== 1) {
-      const [_, least] = findOccurrencies(rotateMatrix(co2Numbers)[i]);
+      const [_, least] = findOccurrencies(flipArray(co2Numbers)[i]);
 
       co2Numbers = co2Numbers.filter((el) => el[i] === least);
     }
