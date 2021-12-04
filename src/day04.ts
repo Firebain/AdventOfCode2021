@@ -3,12 +3,16 @@ type Board = number[][];
 const parse = (str: string): [number[], Board[]] => {
   const [rawNumbers, ...rawBoards] = str.trimEnd().split("\n\n");
 
-  const numbers = rawNumbers.split(",").map((n) => parseInt(n));
+  const numbers = rawNumbers.split(",").map(Number);
 
-  const boards = rawBoards
-    .map((c) => c.split("\n"))
-    .map((c) => c.map((s) => s.split(" ").filter((i) => i !== "")))
-    .map((c) => c.map((s) => s.map((i) => parseInt(i))));
+  const boards = rawBoards.map((c) =>
+    c.split("\n").map((s) =>
+      s
+        .split(" ")
+        .filter((i) => i !== "")
+        .map(Number)
+    )
+  );
 
   return [numbers, boards];
 };
