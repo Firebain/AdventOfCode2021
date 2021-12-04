@@ -3,6 +3,7 @@
   "license": "MIT",
   "scripts": {
     "day": "ts-node ./src/index.ts",
+    "gen": "ts-node ./src/gen.ts",
     "test": "jest"
   },
   "dependencies": {
