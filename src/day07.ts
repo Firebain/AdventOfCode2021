@@ -1,6 +1,6 @@
 const parse = (str: string) => str.split(",").map(Number);
 
-const triangular = (n: number): number => (n > 0 ? triangular(n - 1) + n : 0);
+const triangular = (n: number): number => (n / 2) * (n + 1);
 
 const compute = (input: string, fn: (to: number, pos: number) => number) => {
   const data = parse(input);
