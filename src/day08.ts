@@ -1,117 +1,46 @@
-interface EasyDigits {
-  1: string;
-  4: string;
-  7: string;
-  8: string;
-}
-
-const DIGITS_MAP: [string[], string][] = [
-  [["a", "c", "f", "g", "e", "b"], "0"],
-  [["c", "f"], "1"],
-  [["a", "c", "d", "e", "g"], "2"],
-  [["a", "c", "d", "f", "g"], "3"],
-  [["b", "c", "d", "f"], "4"],
-  [["a", "b", "d", "f", "g"], "5"],
-  [["a", "b", "d", "f", "e", "g"], "6"],
-  [["a", "c", "f"], "7"],
-  [["a", "b", "c", "d", "e", "f", "g"], "8"],
-  [["a", "b", "c", "d", "f", "g"], "9"],
-];
-
 const parse = (str: String) =>
   str
     .trim()
     .split("\n")
-    .map(
-      (l) => l.split(" | ").map((d) => d.split(" ")) as [string[], string[]]
-    );
+    .map((l) => l.split(" | ").flatMap((d) => d.split(" ")));
 
-const easyDigits = (part: [string[], string[]]): EasyDigits => {
-  const out: Partial<EasyDigits> = {};
+const has = (str: string, search: string) =>
+  search.split("").every((c) => str.includes(c));
 
-  const digits = part.flat();
+const decode = (data: string[]): string[] => {
+  const one = data.find((s) => s.length === 2)!;
+  const four = data.find((s) => s.length === 4)!;
+  const seven = data.find((s) => s.length === 3)!;
+  const eight = data.find((s) => s.length === 7)!;
 
-  for (const digit of digits) {
-    if (digit.length === 2) out[1] = digit;
-    if (digit.length === 4) out[4] = digit;
-    if (digit.length === 3) out[7] = digit;
-    if (digit.length === 7) out[8] = digit;
-  }
+  const twoThreeFive = data.filter((s) => s.length === 5);
 
-  return out as EasyDigits;
-};
+  const three = twoThreeFive.find((n) => has(n, one))!;
 
-const restoreSegments = (
-  data: [string[], string[]]
-): { [key: string]: string } => {
-  const easy = easyDigits(data);
+  const zeroSixNine = data.filter((s) => s.length === 6);
 
-  const cf = easy[1].split("");
+  const nine = zeroSixNine.find((n) => has(n, three))!;
+  const five = twoThreeFive.find((n) => n !== three && has(nine, n))!;
+  const two = twoThreeFive.find((n) => n !== three && n !== five)!;
+  const six = zeroSixNine.find((n) => n !== nine && has(n, five))!;
+  const zero = zeroSixNine.find((n) => n !== nine && n !== six)!;
 
-  const a = easy[7].split("").filter((n) => !cf.includes(n))[0];
-
-  const bd = easy[4].split("").filter((n) => !cf.includes(n));
-
-  const cfabd = [...cf, a, ...bd];
-
-  const eg = easy[8].split("").filter((n) => !cfabd.includes(n));
-
-  const abdfg = [...data[0], ...data[1]]
-    .filter((n) => n.length === 5)
-    .find((n) => bd.every((c) => n.includes(c)))!
-    .split("");
-
-  const c = cf.filter((n) => !abdfg.includes(n))[0];
-  const f = cf.filter((n) => n !== c)[0];
-
-  const acdeg = [...data[0], ...data[1]]
-    .filter((n) => n.length === 5)
-    .find((n) => !n.includes(f))!
-    .split("");
-
-  const aceg = [a, c, ...eg];
-
-  const d = acdeg.filter((n) => !aceg.includes(n))[0];
-  const b = bd.filter((n) => n !== d)[0];
-
-  const abdf = [a, b, d, f];
-
-  const g = abdfg.filter((n) => !abdf.includes(n))[0];
-  const e = eg.filter((n) => n !== g)[0];
-
-  return {
-    [a]: "a",
-    [b]: "b",
-    [c]: "c",
-    [d]: "d",
-    [e]: "e",
-    [f]: "f",
-    [g]: "g",
-  };
+  return [zero, one, two, three, four, five, six, seven, eight, nine];
 };
 
 export const first = (input: string) =>
   parse(input)
-    .flatMap((part) => part[1])
+    .flatMap((part) => part.slice(-4))
     .map((num) => num.length)
     .filter((num) => [2, 4, 3, 7].includes(num)).length;
 
 export const second = (input: string) =>
-  parse(input).reduce((acc, part) => {
-    const segments = restoreSegments(part);
-
-    const output = part[1]
-      .map((n) => n.split(""))
-      .map((n) => n.map((c) => segments[c]))
-      .map(
-        (numbers) =>
-          DIGITS_MAP.find(
-            (m) =>
-              numbers.every((n) => m[0].includes(n)) &&
-              m[0].every((n) => numbers.includes(n))
-          )![1]
-      )
-      .join("");
-
-    return acc + Number(output);
-  }, 0);
+  parse(input)
+    .map((data): [string[], string[]] => [decode(data), data])
+    .map(([codes, data]) =>
+      data
+        .slice(-4)
+        .map((num) => codes.findIndex((d) => has(d, num) && has(num, d)))
+        .join("")
+    )
+    .reduce((acc, val) => acc + +val, 0);
